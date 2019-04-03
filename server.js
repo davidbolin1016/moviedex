@@ -1,5 +1,5 @@
 'use strict';
-
+require('dotenv').config();
 
 const express = require('express');
 const morgan = require('morgan');
@@ -12,7 +12,6 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(helmet());
 
-
 function strSearchMovies(type, str) {
   return movies.filter(movie => movie[type].toLowerCase().includes(str.toLowerCase()));
 }
@@ -22,13 +21,19 @@ function voteSearch(vote) {
 }
 
 app.get('/movie', (req, res) => {
+  const token = req.get('Authorization');
+
+  if (!token || token.split(' ')[1] !== process.env.API_TOKEN) {
+    res.status(401).json({error: 'unauthorized request'});
+  }
+  
   const searchType = req.query.searchType;
   const searchTerm = req.query.searchTerm;
   const searchVote = req.query.vote;
 
   if (searchType === 'avg_vote') {
     if (!searchVote) {
-      res.json(400, {error: 'missing input for average vote'});
+      res.status(400).json({error: 'missing input for average vote'});
     }
 
     const vote = parseFloat(searchVote);
@@ -36,11 +41,11 @@ app.get('/movie', (req, res) => {
   }
 
   if (!searchType || ['genre', 'country'].indexOf(searchType) === -1) {
-    res.json(400, {error: 'invalid or missing searchType'});
+    res.status(400).json({error: 'invalid or missing searchType'});
   }
 
   if (!searchTerm) {
-    res.json(400, {error: 'missing search searchTerm'});
+    res.status(400).json({error: 'missing search searchTerm'});
   }
 
 
