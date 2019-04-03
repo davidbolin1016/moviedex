@@ -1,6 +1,6 @@
 # Moviedex search
 
-API endpoint localhost:8000/movie
+API endpoint is http://localhost:8000/movie
 
 Requires Authorization header with Bearer api token.
 

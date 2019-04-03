@@ -15,6 +15,7 @@ app.use(cors());
 
 function checkToken (req, res, next) {
   const token = req.get('Authorization');
+  
   if (!token || token.split(' ')[1] !== process.env.API_TOKEN) {
     res.status(401).json({error: 'unauthorized request'});
   } else {
