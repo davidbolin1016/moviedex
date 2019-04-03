@@ -12,6 +12,15 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(helmet());
 
+function checkToken (req, res, next) {
+  const token = req.get('Authorization');
+  if (!token || token.split(' ')[1] !== process.env.API_TOKEN) {
+    res.status(401).json({error: 'unauthorized request'});
+  }
+}
+
+app.use(checkToken);
+
 function strSearchMovies(type, str) {
   return movies.filter(movie => movie[type].toLowerCase().includes(str.toLowerCase()));
 }
@@ -21,11 +30,9 @@ function voteSearch(vote) {
 }
 
 app.get('/movie', (req, res) => {
-  const token = req.get('Authorization');
+  
 
-  if (!token || token.split(' ')[1] !== process.env.API_TOKEN) {
-    res.status(401).json({error: 'unauthorized request'});
-  }
+  
   
   const searchType = req.query.searchType;
   const searchTerm = req.query.searchTerm;
