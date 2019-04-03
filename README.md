@@ -4,10 +4,8 @@ API endpoint localhost:8000/movie
 
 Requires Authorization header with Bearer api token.
 
-Takes query parameters :
+Takes one or more query parameters 'genre', 'country', 'avg_vote'
+Genre and country are search strings; avg_vote is a numerical minimum for the returned movies.
 
-searchType (string): 'genre', 'country', or 'avg_vote'
-vote (number, only if searching by avg_vote)
-searchTerm (string, only used if searching by genre or country)
-
+At least one parameter must be specified. Using more than one will return movies satisfying all parameters.
 
