@@ -3,61 +3,57 @@ require('dotenv').config();
 
 const express = require('express');
 const morgan = require('morgan');
-const cors = require('cors');
 const helmet = require('helmet');
+const cors = require('cors');
 const movies = require('./movies.json');
+
 const app = express();
 
 app.use(morgan('dev'));
-app.use(cors());
 app.use(helmet());
+app.use(cors());
 
 function checkToken (req, res, next) {
   const token = req.get('Authorization');
   if (!token || token.split(' ')[1] !== process.env.API_TOKEN) {
     res.status(401).json({error: 'unauthorized request'});
+  } else {
+    next();
   }
 }
 
 app.use(checkToken);
 
-function strSearchMovies(type, str) {
+function strSearchMovies(movies, type, str) {
   return movies.filter(movie => movie[type].toLowerCase().includes(str.toLowerCase()));
 }
 
-function voteSearch(vote) {
+function voteSearch(movies, vote) {
   return movies.filter(movie => parseFloat(movie['avg_vote']) >= vote);
 }
 
 app.get('/movie', (req, res) => {
-  
+  let movieSelection = movies;
+  const { genre, country, avg_vote } = req.query;
 
-  
-  
-  const searchType = req.query.searchType;
-  const searchTerm = req.query.searchTerm;
-  const searchVote = req.query.vote;
-
-  if (searchType === 'avg_vote') {
-    if (!searchVote) {
-      res.status(400).json({error: 'missing input for average vote'});
-    }
-
-    const vote = parseFloat(searchVote);
-    res.json(voteSearch(vote));
+  if (avg_vote) {
+    const vote = parseFloat(avg_vote);
+    movieSelection = voteSearch(movieSelection, vote);
   }
 
-  if (!searchType || ['genre', 'country'].indexOf(searchType) === -1) {
-    res.status(400).json({error: 'invalid or missing searchType'});
+  if (genre) {
+    movieSelection = strSearchMovies(movieSelection, 'genre', genre);
   }
 
-  if (!searchTerm) {
-    res.status(400).json({error: 'missing search searchTerm'});
+  if (country) {
+    movieSelection = strSearchMovies(movieSelection, 'country', country);
   }
 
-
-
-  res.json(strSearchMovies(searchType, searchTerm));
+  if (!avg_vote && !genre && !country) {
+    res.status(400).json({error: 'invalid or missing search'});
+  } else {
+    res.status(200).json(movieSelection);
+  }
 });
 
 app.listen(8000, () => {
