@@ -2,6 +2,8 @@
 
 API endpoint is http://localhost:8000/movie
 
+8000 may be another port if needed.
+
 Requires Authorization header with Bearer api token.
 
 Takes one or more query parameters 'genre', 'country', 'avg_vote'
