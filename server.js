@@ -71,5 +71,8 @@ app.use((error, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 8000;
-// adding comment to rebuild
-app.listen(PORT, () => { });
+
+app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log(`Server listening at Port ${PORT}`);
+});
